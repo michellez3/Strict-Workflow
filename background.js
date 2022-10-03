@@ -1,7 +1,5 @@
 /*
-
   Constants
-
 */
 
 var PREFS = loadPrefs(),
@@ -115,9 +113,7 @@ for(var i in iconTypeS) {
 }
 
 /*
-
   Models
-
 */
 
 function Pomodoro(options) {
@@ -188,9 +184,7 @@ Pomodoro.Timer = function Timer(pomodoro, options) {
 }
 
 /*
-
   Views
-
 */
 
 // The code gets really cluttered down here. Refactor would be in order,
@@ -289,7 +283,7 @@ function executeInAllBlockedTabs(action) {
 }
 
 var notification, mainPomodoro = new Pomodoro({
-  getDurations: function () { return PREFS.durations },
+  getDurations: function () { return PREFS.durations },           //change icon when timer ends
   timer: {
     onEnd: function (timer) {
       chrome.browserAction.setIcon({
@@ -297,7 +291,7 @@ var notification, mainPomodoro = new Pomodoro({
       });
       chrome.browserAction.setBadgeText({text: ''});
       
-      if(PREFS.showNotifications) {
+      if(PREFS.showNotifications) {                               // notify that the timer ended
         var nextModeName = chrome.i18n.getMessage(timer.pomodoro.nextMode);
         chrome.notifications.create("", {
           type: "basic",
@@ -307,9 +301,32 @@ var notification, mainPomodoro = new Pomodoro({
           priority: 2,
           iconUrl: ICONS.FULL[timer.type]
         }, function() {});
-      }
+
+        
+        //create new clock for after break ended
+        if (timer.pomodoro.mostRecentMode == 'break')
+        {
+          console.log("entered clock creation");
+          chrome.alarms.create('breakReminder', {
+            delayInMinutes: 1,
+          });
+        }
+      };
       
-      if(PREFS.shouldRing) {
+      chrome.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name == "breakReminder") {
+          console.log("entered alarm listener");
+            chrome.notifications.create("", {
+                type: "basic",
+                title: chrome.i18n.getMessage("break_end_notification_header"),
+                message: chrome.i18n.getMessage("break_end_notification_body"),
+                iconUrl: ICONS.FULL[timer.type]
+            }, function() {});
+          }
+      });
+
+      
+      if(PREFS.shouldRing) {                                      //ringing
         console.log("playing ring", RING);
         RING.play();
       }

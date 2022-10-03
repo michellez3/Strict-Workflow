@@ -100,5 +100,22 @@
         "example": "work"
       }
     }
+  },
+
+  "break_end_notification_header": {
+    "message": "Break is over!",
+    "description": "Bold header of pop-up notification when a break timer ends"
+  },
+  "break_end_notification_body": {
+    "message": "Hey! Your break ended 1 minute ago. Get to work!",
+    "description": "Body of pop-up notification when a break timer ends",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "work"
+      }
+    }
   }
+
+
 }
